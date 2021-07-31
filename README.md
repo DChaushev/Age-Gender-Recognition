@@ -41,3 +41,4 @@ Cons:
 - does a lot of errors;
 - does not find non-frontal faces.
 
+![Haar Cascade Face Detector Experiments](/images/haar-cascade-experiments.png?raw=true "Optional Title")
