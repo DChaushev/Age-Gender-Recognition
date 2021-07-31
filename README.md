@@ -23,3 +23,21 @@ I did considerable research and ended up with the following constraints:
 - at most 0.5 seconds time for one prediction so the system does not lag much.
 
 ## Finding faces in an image
+
+I researched four approaches for this task and I narrowed down to trying two of them:
+
+### Haar Cascade Face Detector
+
+This was considered the state-of-the-art approach after it was presented in 2001 from Paul Viola and Michael J. Jones.
+I am not going to explain how it works, you can check the paper or search online for more information, but I am going to tell
+you about my experience with it.
+
+Pros:
+- almost works in real time on a CPU;
+- very simple architecture;
+- finds faces with different sizes.
+
+Cons:
+- does a lot of errors;
+- does not find non-frontal faces.
+
