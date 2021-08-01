@@ -41,7 +41,7 @@ Cons:
 - does a lot of errors;
 - does not find non-frontal faces.
 
-![Haar Cascade Face Detector Experiments](/images/haar-cascade-experiments.png?raw=true "Optional Title")
+![Haar Cascade Face Detector Experiments](/images/haar-cascade-experiments.png?raw=true "Haar Cascade Face Detector Experiments.")
 
 ### Neural network based approach
 
@@ -57,7 +57,7 @@ This is the model I decided to use in the application:
 
 Looked supperb to Haar Cascade:
 
-![Single-Shot-Multibox Detector Experiments](/images/ssm-detector-experiments.png?raw=true "Optional Title")
+![Single-Shot-Multibox Detector Experiments.](/images/ssm-detector-experiments.png?raw=true "Single-Shot-Multibox Detector Experiments.")
 
 The other two approaches I researched were [HoG (Historgram of Oriented Gradients)][4] and [Maximum-Margin Object Detector][5].
 
@@ -74,6 +74,48 @@ the information is wrong or incomplete, so the preprocessing of the data include
 Most of the mentioned preprocessing was done using the available information from the dataset, as **gender**, **face_score**,
 **second_face_score**, etc.
 
+The original dataset contains around 523 051 images, but after this preprocessing they got reduced to around 110 000.
+
+The second preprocessing step was to crop the images so only the faces are left, because the people in the original images are
+often photographed from the weist up or even in full-length.
+This step has a lot of advantages:
+- the dataset size is reduced;
+- we can use smaller neural networks, as the network wouldn't have to learn which part of the image is the face;
+- the images that we are going to predict on are of cropped faces.
+
+It was only logical to use the same face recognition algorithm that was going to be used in the final application.
+Here are some examples of the cropping:
+![Before and after cropping examples.](/images/cropped-images.png?raw=true "Before and after cropping examples.")
+
+There were only two photos in which the algorithm was unable to find faces and I decided to not include them into the final
+dataset:
+![The "face-less" images.](/images/no-face-images.png?raw=true "The "face-less" images.")
+
+As can be seen in the dataset distribution chart, most of the people are between 20 and 50 years old. This is probably due to the
+fact that the photos are mainly of famous actors.
+![IMDB-WIKI distribution.](/images/dataset_dist.png?raw=true "IMDB-WIKI distribution.")
+
+That's why I decided to include and another dataset - the [UKTFace][7]. It contains of 20 000 images of people between 1 and 116 years old. For convinience the authors provide version with cropped faces.
+
+This is age histogram of the combined datasets (the preprocessed IMDB-WIKI and UKTFace):
+![Combined datasets distribution.](/images/IMDB-WIKI_UKTFace_dist.png?raw=true "Combined datasets distribution.")
+
+As can be seen, still the majority of people is between 20 and 45 years old. To get more even distribution I decided to remove
+part of the examples. The average number of images per age was 1393:
+
+![Count per age.](/images/count_per_age.png?raw=true "Count per age.")
+
+I trimmed the examples between 20 and 50 to a maximum of 1500 examples per age. Assuming that the larger by memory images will be
+with better quaility and will contribute more, I sorted those images by file size and got the 1500 biggest for each of those 30 ages.
+
+Here is the histogram of the final dataset used for the age recognition task:
+![Trimmed histogram.](/images/trimmed_hist.png?raw=true "Trimmed histogram.")
+
+For the gender recognition I used the dataset before the trimming, as the examples were almost evenly distributed.
+
+## Age recognition from face image
+
+
 ## References
 
 <p>[1]: https://www.cs.cmu.edu/~efros/courses/LBMV07/Papers/viola-cvpr-01.pdf (P. Viola and M. Jones, "Rapid Object Detection using a Boosted Cascade of Simple Features", Conference on Computer Vision and Pattern Recognition, 2001.)
@@ -82,6 +124,7 @@ Most of the mentioned preprocessing was done using the available information fro
 <p>[4]: https://www.learnopencv.com/histogram-of-oriented-gradients (S. Mallick, „Histogram of Oriented Gradients,“ 2016.)
 <p>[5]: https://arxiv.org/abs/1502.00046 (D. King, Max-Margin Object Detection, 2015.)
 <p>[6]: https://data.vision.ee.ethz.ch/cvl/rrothe/imdb-wiki (IMDB-WIKI – 500k+ face images with age and gender labels, 2015.)
+<p>[7]: https://susanqq.github.io/UTKFace (UKTFace Large Scale Face Dataset.)
   
 [1]: https://www.cs.cmu.edu/~efros/courses/LBMV07/Papers/viola-cvpr-01.pdf (P. Viola and M. Jones, "Rapid Object Detection using a Boosted Cascade of Simple Features", Conference on Computer Vision and Pattern Recognition, 2001.)
 [2]: https://arxiv.org/abs/1512.02325 (W. Liu, D. Anguelov, D. Erhan, C. Szegedy, S. Reed, C.-Y. Fu и A. Berg, SSD: Single Shot MultiBox Detector, 2016.)
@@ -89,3 +132,4 @@ Most of the mentioned preprocessing was done using the available information fro
 [4]: https://www.learnopencv.com/histogram-of-oriented-gradients (S. Mallick, „Histogram of Oriented Gradients,“ 2016.)
 [5]: https://arxiv.org/abs/1502.00046 (D. King, Max-Margin Object Detection, 2015.)
 [6]: https://data.vision.ee.ethz.ch/cvl/rrothe/imdb-wiki (IMDB-WIKI – 500k+ face images with age and gender labels, 2015.)
+[7]: https://susanqq.github.io/UTKFace (UKTFace Large Scale Face Dataset.)
