@@ -115,6 +115,31 @@ For the gender recognition I used the dataset before the trimming, as the exampl
 
 ## Age recognition from face image
 
+As we now have prepared our data, we can proceed with the second of the defined tasks - age recognition from face image.
+I will avoid mentioning all the research and trial and error I did and I will just present the final convlutional neural network 
+architecture I ended up with:
+
+```python
+    tf.keras.models.Sequential([
+        Input(shape=image_shape),
+        Conv2D(64, 3, activation='relu'),
+        Conv2D(64, 3, activation='relu'),
+        MaxPool2D(2),
+        Dropout(0.3),
+        Conv2D(128, 3, activation='relu'),
+        Conv2D(128, 3, activation='relu'),
+        MaxPool2D(2),
+        Dropout(0.3),
+        Conv2D(196, 3, activation='relu'),
+        Dropout(0.3),
+        Flatten(),
+        Dense(64, activation='relu'),
+        Dense(1)
+    ])
+```
+
+The image_shape is a touple - (60, 80, 1) (image size i 60x80 and its grayscaled).
+Number of parameters - 2 366 725.
 
 ## References
 
