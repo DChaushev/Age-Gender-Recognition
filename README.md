@@ -89,7 +89,7 @@ Here are some examples of the cropping:
 
 There were only two photos in which the algorithm was unable to find faces and I decided to not include them into the final
 dataset:
-![The "face-less" images.](/images/no-face-images.png?raw=true "The "face-less" images.")
+![The "face-less" images.](/images/no-face-images.png?raw=true "The 'face-less' images.")
 
 As can be seen in the dataset distribution chart, most of the people are between 20 and 50 years old. This is probably due to the
 fact that the photos are mainly of famous actors.
@@ -116,7 +116,7 @@ For the gender recognition I used the dataset before the trimming, as the exampl
 ## Age recognition from face image
 
 As we now have prepared our data, we can proceed with the second of the defined tasks - age recognition from face image.
-I will avoid mentioning all the research and trial and error I did and I will just present the final convlutional neural network 
+I will avoid mentioning all the research and trial and error I did and I will just present the final convolutional neural network 
 architecture I ended up with:
 
 ```python
@@ -137,9 +137,29 @@ architecture I ended up with:
         Dense(1)
     ])
 ```
+Number of parameters - 2 366 725. Оbjective function - MAE (Mean absolute error).
 
-The image_shape is a touple - (60, 80, 1) (image size i 60x80 and its grayscaled).
-Number of parameters - 2 366 725.
+The image_shape is a touple representing the image size - (60, 80, 1), meaning 60x80 and 1 for grayscaled.
+I decided to work with grayscaled images to reduce the number of parameters. The 60x80 size is chosen as this is standart ratio
+of portrait photos and after the resizing, the majority of photos ended up with similar width-height ratio.
+
+The images are batched to 128 images per batch. The data is split to 80-10-10.
+After the data trimming, the number of images is reduced to 79 124, so I used data augmentation to artifficially increase the
+number of data.
+The model was trained with patience of 50 epochs. The initial learning rate is 0.001, but after 12 consecutive validations without
+improvement, it is reduced by multiplying with 0.1.
+The model was trained for 16 hours, 49 minutes and 11 seconds on NVIDIA GeForce 760m and achieved MAE 5.86 at epoch 108:
+
+![Age recognition model training.](/images/age-recognition-model-training.png?raw=true "Age recognition model training.")
+
+The model evaluation acheived 5.9652 MAE.
+One prediction takes around 0.03 seconds on the mentioned video processor.
+
+## Gender recognition from face image
+
+The last from the defined tasks is gender recognition from face image.
+I used the same neural network, but as this task was approached as a classification task, the last regression layer is replaced
+with a softmax layer with two outputs. The used objective function is Categorical Cross-Entropy loss and the optimization algorithm is Adam.
 
 ## References
 
