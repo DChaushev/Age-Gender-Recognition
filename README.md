@@ -1,5 +1,7 @@
 # Age-Gender-Recognition
 
+***WORK IN PROGRESS (Pending redaction)***
+
 Table of Contents
 - [Intro](#intro)
 - [Defining the goals](#defining-the-goals)
