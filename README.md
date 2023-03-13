@@ -1,6 +1,6 @@
 # Age-Gender-Recognition
 
-***WORK IN PROGRESS (Pending redaction)***
+***WORK IN PROGRESS (Pending editing)***
 
 Table of Contents
 - [Intro](#intro)
