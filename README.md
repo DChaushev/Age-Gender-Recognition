@@ -18,39 +18,38 @@ Table of Contents
 
 ## Intro
 
-This is a project I did as my master's thesis in the university. My master's was Artificial Intelligence. During the education course we were working mainly on NLP projects that's why I wanted to challenge myself and do something in the computer vision area. I decided to create a system that recognises age and gender from a person's face from a real time video.
+This is the project I did as my master's thesis in Artificial Intelligence. During the education course, we were working mainly on NLP projects and that's why I wanted to challenge myself and do something in the computer vision area. I decided to create a system that recognizes age and gender from a person's face from video in real-time.
 
-I am going to explain everything I did and the results I achieved, but I am assuming that the reader has at least basic ML/AI 
-knowledge and is familliar with the fundamental concepts.
+I am going to explain everything I did and the results I achieved, but I am assuming that the reader has at least basic ML/AI knowledge and is familiar with the fundamental concepts.
 
 ## Defining the goals
 
-As each video frame is in fact a single image, the task was separated into three subtasks:
+As each video frame is a single image, the task was separated into three subtasks:
 - finding faces in images;
 - age recognition from face image;
 - gender recognition from face image.
 
-I used convolutional neural networks for all three subtasks, but having in mind that the system should work in real time, the models had to be lightweight as at the same time they should yield satisfactory results.
+I used convolutional neural networks for all three subtasks. Having in mind that the system should work in real-time, the models had to be lightweight and at the same time yield satisfactory results.
 
-I did considerable research and ended up with the following constraints:
-- at most 0.8 MAE for the reggresional age recognition model;
+After reading through a lot of papers for similar tasks, I ended up with the following constraints:
+- at most 0.8 MAE for the regressional age recognition model;
 - at least 93% accuracy for the classification gender recognition model;
-- at most 0.5 seconds time for one prediction so the system does not lag much.
+- at most 0.5 seconds for one prediction so the system can be without unusable lag.
 
 ## Finding faces in an image
 
-I researched four approaches for this task and I narrowed down to trying two of them:
+I researched four approaches for this task and I narrowed it down to trying two of them:
 
 ### Haar Cascade Face Detector
 
-This was considered the state-of-the-art approach after it was presented in 2001 from [Paul Viola and Michael J. Jones][1] \[1].
+This was considered the state-of-the-art approach after it was presented in 2001 by [Paul Viola and Michael J. Jones][1] \[1].
 I am not going to explain how it works, you can check the paper or search online for more information, but I am going to tell
 you about my experience with it.
 
 Pros:
-- almost works in real time on a CPU;
+- almost works in real-time on a CPU;
 - very simple architecture;
-- finds faces with different sizes.
+- finds faces of different sizes.
 
 Cons:
 - does a lot of errors;
@@ -58,47 +57,47 @@ Cons:
 
 ![Haar Cascade Face Detector Experiments](/images/haar-cascade-experiments.png?raw=true "Haar Cascade Face Detector Experiments.")
 
-### Neural network based approach
+### Neural network-based approach
 
-Then I tried face detection using [Singe-Shot-Multibox detector][2] \[2], which is using shallower version of the ResNet architecture - ResNet 10. The model is trained over images from internet. [OpenCV][3] \[3] provides the model and the trained weights.
+Then I tried face detection using [Singe-Shot-Multibox detector][2] \[2], which is using the shallower version of the ResNet architecture - ResNet 10. The model is trained over images from the internet. [OpenCV][3] \[3] provides the model and the trained weights.
 
 This is the model I decided to use in the application:
 
-- the most accurate from all researched approaches;
-- works in real time on a CPU;
+- the most accurate of all researched approaches;
+- works in real-time on a CPU;
 - works with different face orientations;
-- finds faces with different sizes.
+- finds faces of different sizes.
 
-Looked supperb to Haar Cascade:
+Looked superb to Haar Cascade:
 
 ![Single-Shot-Multibox Detector Experiments.](/images/ssm-detector-experiments.png?raw=true "Single-Shot-Multibox Detector Experiments.")
 
-The other two approaches I researched were [HoG (Historgram of Oriented Gradients)][4] \[4] and [Maximum-Margin Object Detector][5] \[5].
+The other two approaches I researched were [HoG (Histogram of Oriented Gradients)][4] \[4] and [Maximum-Margin Object Detector][5] \[5].
 
 ## Selecting and preparing the training set
 
-Training the models for age and gender recognition requires images dataset labeled with the age and the gender of the person on the image. The biggest publicly available such dataset was [IMDB-WIKI][6] \[6]. As the whole dataset is auto generated, huge part of the information is wrong or incomplete, so the preprocessing of the data included:
+Training the models for age and gender recognition requires an image dataset labeled with the age and gender of the person on the image. The biggest publicly available such dataset was [IMDB-WIKI][6] \[6]. As the whole dataset is auto-generated, a huge part of the information is wrong or incomplete, so the preprocessing of the data included:
 - removing images without gender;
-- removing images without a face in it;
+- removing images without a face in them;
 - removing images with more than one face;
-- removing images where the confidence of face existing is less than 3;
+- removing images where the confidence of the face existing is less than 3;
 - after the calculation of the ages, I removed images where the age is less than 1 or greater than 100.
 
-Most of the mentioned preprocessing was done using the available information from the dataset, as **gender**, **face_score**, **second_face_score**, etc.
+Most of the mentioned preprocessing was done using the available information from the dataset, such as **gender**, **face_score**, **second_face_score**, etc.
 
-The original dataset contains around 523 051 images, but after this preprocessing they got reduced to around 110 000.
+The original dataset contains around 523 051 images, but after this preprocessing, they got reduced to around 110 000.
 
-The second preprocessing step was to crop the images so only the faces are left, because the people in the original images are often photographed from the weist up or even in full-length.
+The second preprocessing step was to crop the images so only the faces are left because the people in the original images are often photographed from the waist up or even in full-length.
 This step has a lot of advantages:
 - the dataset size is reduced;
 - we can use smaller neural networks, as the network wouldn't have to learn which part of the image is the face;
-- the images that we are going to predict on are of cropped faces.
+- the images that we are going to predict are of cropped faces.
 
 It was only logical to use the same face recognition algorithm that was going to be used in the final application.
 Here are some examples of the cropping:
 ![Before and after cropping examples.](/images/cropped-images.png?raw=true "Before and after cropping examples.")
 
-There were only two photos in which the algorithm was unable to find faces and I decided to not include them into the final
+There were only two photos in which the algorithm was unable to find faces and I decided to not include them in the final
 dataset:
 ![The "face-less" images.](/images/no-face-images.png?raw=true "The 'face-less' images.")
 
@@ -107,25 +106,25 @@ fact that the photos are mainly of famous actors.
 
 <img src="/images/dataset_dist.png" width="640">
 
-That's why I decided to include and another dataset - the [UKTFace][7] \[7]. It contains of 20 000 images of people between 1 and 116 years old. For convinience the authors provide version with cropped faces.
+That's why I decided to include another dataset - the [UKTFace][7] \[7]. It contains 20 000 images of people between 1 and 116 years old. For convinience, the authors provide a version with cropped faces.
 
-This is age histogram of the combined datasets (the preprocessed IMDB-WIKI and UKTFace):
+This is the age histogram of the combined datasets (the preprocessed IMDB-WIKI and UKTFace):
 ![Combined datasets distribution.](/images/IMDB-WIKI_UKTFace_dist.png?raw=true "Combined datasets distribution.")
 
 As can be seen, still the majority of people is between 20 and 45 years old. To get more even distribution I decided to remove part of the examples. The average number of images per age was 1393:
 
 ![Count per age.](/images/count_per_age.png?raw=true "Count per age.")
 
-I trimmed the examples between 20 and 50 to a maximum of 1500 examples per age. Assuming that the larger by memory images will be with better quaility and will contribute more, I sorted those images by file size and got the 1500 biggest for each of those 30 ages.
+I trimmed the examples between 20 and 50 to a maximum of 1500 examples per age. Assuming that the larger memory images will be of better quality and will contribute more, I sorted those images by file size and got the 1500 biggest for each of those 30 ages.
 
 Here is the histogram of the final dataset used for the age recognition task:
 ![Trimmed histogram.](/images/trimmed_hist.png?raw=true "Trimmed histogram.")
 
-For the gender recognition I used the dataset before the trimming, as the examples were almost evenly distributed.
+For the gender recognition, I used the dataset before the trimming, as the examples were almost evenly distributed.
 
-## Age recognition from face image
+## Age recognition from a face image
 
-As we now have prepared our data, we can proceed with the second of the defined tasks - age recognition from face image.
+As we now have prepared our data, we can proceed with the second of the defined tasks - age recognition from a face image.
 I will avoid mentioning all the research and trial and error I did and I will just present the final convolutional neural network 
 architecture I ended up with:
 
@@ -147,25 +146,25 @@ architecture I ended up with:
         Dense(1)
     ])
 ```
-Number of parameters - 2 366 725. Оbjective function - MAE (Mean absolute error). Optimization algorithm - [Adam][8] \[8].
+The number of parameters - 2 366 725. Оbjective function - MAE (Mean absolute error). Optimization algorithm - [Adam][8] \[8].
 
-The image_shape is a touple representing the image size - (60, 80, 1), meaning 60x80 and 1 for grayscaled. I decided to work with grayscaled images to reduce the number of parameters. The 60x80 size is chosen as this is standart ratio of portrait photos and after the resizing, the majority of photos ended up with similar width-height ratio.
+The image_shape is a tuple representing the image size - (60, 80, 1), meaning 60x80 and 1 for grayscale. I decided to work with grayscaled images to reduce the number of parameters. The 60x80 size is chosen as this is the standard ratio of portrait photos and after the resizing, the majority of photos ended up with a similar width-height ratio.
 
 The images are batched to 128 images per batch. The data is split to 80-10-10.
-After the data trimming, the number of images is reduced to 79 124, so I used data augmentation to artifficially increase the
+After the data trimming, the number of images is reduced to 79 124, so I used data augmentation to artificially increase the
 number of data.
-The model was trained with patience of 50 epochs. The initial learning rate is 0.001, but after 12 consecutive validations without
+The model was trained with a patience of 50 epochs. The initial learning rate is 0.001 but after 12 consecutive validations without
 improvement, it is reduced by multiplying with 0.1.
-The model was trained for 16 hours, 49 minutes and 11 seconds on NVIDIA GeForce 760m and achieved MAE 5.86 at epoch 108:
+The model was trained for 16 hours, 49 minutes, and 11 seconds on NVIDIA GeForce 760m and achieved MAE 5.86 at epoch 108:
 
 ![Age recognition model training.](/images/age-recognition-model-training.png?raw=true "Age recognition model training.")
 
-The model evaluation acheived 5.9652 MAE.
+The model evaluation achieved 5.9652 MAE.
 One prediction takes around 0.03 seconds on the mentioned video processor.
 
-## Gender recognition from face image
+## Gender recognition from a face image
 
-The last from the defined tasks is gender recognition from face image.
+The last of the defined tasks is gender recognition from a face image.
 I used the same neural network, but as this task was approached as a classification task, the last regression layer is replaced with a softmax layer with two outputs. The used objective function is Categorical Cross-Entropy loss and the optimization algorithm is again Adam.
 
 ```python
@@ -187,7 +186,7 @@ I used the same neural network, but as this task was approached as a classificat
         # Dense(1) // for age regression
     ])
 ```
-The model was trained for 14 hours, 52 minutes and 8 seconds, but the training was manually cancelled, because in the last 3 hours the improvement was within thousandths. The model achieved accuracy of 95.92% after evaluation with the testing data. One predicion took around 0.03 seconds on the mentioned video processor.
+The model was trained for 14 hours, 52 minutes, and 8 seconds, but the training was manually canceled because, in the last 3 hours, the improvement was within thousandths. The model achieved an accuracy of 95.92% after evaluation with the testing data. One prediction took around 0.03 seconds on the mentioned video processor.
 
 <img src="/images/gender-recognition-model-training.png" width="614">
 
@@ -202,7 +201,7 @@ The models were trained on the following machine:<br>
 **RAM**: 8GB<br>
 **Video card**: NVIDIA GeForce GTX 760m with 768 CUDA cores and 2 GB GDDR5 memory.
 
-Due to the fact that the video card is with Compute Capability 3.0, but TensorFlow after version 1.14 (I think) supports only video processors with Compute Capability at least 3.5 (due to multiple GPU support), I had to build TensorFlow from source after changing it to support Compute Capability 3.0.
+Because the video card is with Compute Capability 3.0, but TensorFlow after version 1.14 (I think) supports only video processors with Compute Capability at least 3.5 (due to multiple GPU support), I had to build TensorFlow from source after changing it to support Compute Capability 3.0.
 
 p.s. 2GB of video memory is extremely insufficient.
 
@@ -237,9 +236,9 @@ The workflow of the application is described on the following flow chart:
 
 Male model real age - 27, predicted - 26-31. Female model real age - 22, predicted - 22-24.
 
-Predicting real age is a hard task even for humans. From the conducted experiments it was found that despite being very close, the model often makes mistakes predicing real age, but it does great job predicting apparent age.
+Predicting real age is a hard task even for humans. From the conducted experiments it was found that despite being very close, the model often makes mistakes predicting real age, but it does a great job predicting apparent age.
 
-In conclusion I can state that all defined tasks were accomplished.
+In conclusion, I can state that all defined tasks were accomplished.
 
 ## References
 
