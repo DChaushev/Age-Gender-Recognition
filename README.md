@@ -1,5 +1,4 @@
 # Age-Gender-Recognition
-My master's thesis in Artificial Intelligence.
 
 ***WORK IN PROGRESS***
 
